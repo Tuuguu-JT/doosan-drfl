@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 # Linux only: turn Doosan's static libDRFL.a into libDRFL.so so Python ctypes can load it.
-# Usage: bash python/build_linux_lib.sh [ubuntu_version]   (default: this machine's, e.g. 22.04)
+# Usage: bash drfl/build_linux_so.sh [ubuntu_version]   (default: this machine's, e.g. 22.04)
 set -euo pipefail
-cd "$(dirname "$0")/.."
+cd "$(dirname "$0")/.."    # repo root
 
 . /etc/os-release
 VER="${1:-$VERSION_ID}"

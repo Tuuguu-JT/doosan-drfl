@@ -2,7 +2,7 @@
 
 Windows: loads drfl/lib/win64/DRFLWin64.dll.
 Linux:   loads drfl/lib/linux/<arch>/<ubuntu>/libDRFL.so, built once from Doosan's
-         static libDRFL.a by python/build_linux_lib.sh.
+         static libDRFL.a by drfl/build_linux_so.sh.
 """
 
 import ctypes
@@ -12,7 +12,7 @@ import sys
 import time
 from pathlib import Path
 
-import doosan_config as cfg
+from . import config as cfg
 
 c_ctrl = ctypes.c_void_p
 c_float6 = ctypes.c_float * cfg.NUM_JOINT
@@ -41,7 +41,7 @@ def load_library() -> ctypes.CDLL:
     """Load the DRFL shared library for this OS / CPU."""
     if ctypes.sizeof(ctypes.c_void_p) != 8:
         raise SystemExit("Needs 64-bit Python.")
-    drfl = (Path(__file__).resolve().parent / cfg.DRFL_DIR).resolve()
+    drfl = cfg.DRFL_DIR
     if sys.platform == "win32":
         lib_dir = drfl / "lib" / "win64"
         os.add_dll_directory(str(lib_dir))           # so the Poco DLLs are found
@@ -50,7 +50,7 @@ def load_library() -> ctypes.CDLL:
         arch = {"x86_64": "amd64", "aarch64": "arm64"}.get(platform.machine(), platform.machine())
         so = drfl / "lib" / "linux" / arch / _ubuntu_version() / "libDRFL.so"
         if not so.exists():
-            raise SystemExit(f"{so} not found. Run: bash python/build_linux_lib.sh")
+            raise SystemExit(f"{so} not found. Run: bash drfl/build_linux_so.sh")
         return ctypes.CDLL(str(so))                  # finds Poco via rpath $ORIGIN
     raise SystemExit(f"Unsupported platform: {sys.platform}")
 
@@ -147,9 +147,10 @@ class Robot:
         self._require(self._open(self.ctrl, cfg.HOST.encode(), cfg.PORT), "open_connection")
         self.connected = True
         self._monitoring_version(self.ctrl, 1)
-        if self._get_system(self.ctrl) != cfg.ROBOT_SYSTEM_VIRTUAL:
-            raise SystemExit("Refusing to run: controller is not ROBOT_SYSTEM_VIRTUAL.")
-        print(f"connected: {cfg.HOST}:{cfg.PORT} (virtual)")
+        virtual = self._get_system(self.ctrl) == cfg.ROBOT_SYSTEM_VIRTUAL
+        if not virtual and not cfg.ALLOW_REAL_ROBOT:
+            raise SystemExit("Refusing to run: controller is a REAL robot (set ALLOW_REAL_ROBOT).")
+        print(f"connected: {cfg.HOST}:{cfg.PORT} ({'virtual' if virtual else 'REAL robot'})")
 
     def take_control(self) -> None:
         self.access = -1

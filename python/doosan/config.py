@@ -1,9 +1,12 @@
-"""Settings for the Doosan simulator demo, plus the DRFL constants it uses."""
+"""User settings (top) and DRFL constants (bottom) for the doosan package."""
+
+from pathlib import Path
 
 # --- Connection -------------------------------------------------------------
-HOST = "127.0.0.1"          # local DART-Studio virtual controller only
+HOST = "127.0.0.1"          # simulator; a real controller is usually 192.168.137.100
 PORT = 12345
-DRFL_DIR = "../drfl"        # relative to this python/ folder
+ALLOW_REAL_ROBOT = False    # safety: refuse to move unless the controller is virtual
+DRFL_DIR = Path(__file__).resolve().parents[2] / "drfl"   # repo/drfl
 LINUX_UBUNTU_VERSION = None # None = auto-detect from /etc/os-release, or e.g. "22.04"
 # Controller v2.x (DRCF 2) is assumed: functions like _set_digital_output are the
 # v2 variants. For a v3 controller use the *_ex variants instead.

@@ -1,17 +1,16 @@
 """Move one joint of the DART-Studio virtual H2017 out and back.
 
-Usage (64-bit Python 3.8+):
-    python simulator_motion_demo.py           # DART-Studio disconnected
-    python simulator_motion_demo.py --watch   # pause so DART-Studio can reconnect and watch
+Usage (64-bit Python 3.8+), from the python/ folder:
+    python main.py            # DART-Studio disconnected
+    python main.py --watch    # pause so DART-Studio can reconnect and watch
 
 DART-Studio refuses to hand over control while it is connected, so disconnect it
-first (leave the virtual controller running). Settings live in doosan_config.py.
+first (leave the virtual controller running). Settings live in doosan/config.py.
 """
 
 import sys
 
-import doosan_config as cfg
-from doosan_robot import Robot, fmt
+from doosan import Robot, cfg, fmt
 
 
 def main() -> None:

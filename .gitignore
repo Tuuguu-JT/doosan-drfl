@@ -18,3 +18,4 @@ drfl/lib/linux/**/libDRFL.so
 # Editor
 .vscode/
 .vs/
+test_code/
